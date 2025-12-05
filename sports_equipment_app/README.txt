@@ -8,4 +8,4 @@ To run backend locally:
   npm install
   npm start
 
-To host frontend as static site upload frontend/ files to S3 or similar.
+To host frontend as static site upload frontend/ files to S3 or siilar.
