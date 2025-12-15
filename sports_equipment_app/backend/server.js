@@ -1,15 +1,21 @@
 const express = require("express");
 const cors = require("cors");
-const app = express();
-const PORT = process.env.PORT || 3000;
 
+const app = express();
+
+// ✅ Allow frontend (for now allow all)
 app.use(cors());
 app.use(express.json());
 
 const products = require("./products.json");
 
+// ✅ API route
 app.get("/products", (req, res) => {
-    res.json(products);
+  res.json(products);
 });
 
-app.listen(PORT, () => console.log(`API running on port ${PORT}`));
+// ✅ EB-required port
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`API running on port ${PORT}`);
+});
