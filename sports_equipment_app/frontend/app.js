@@ -1,4 +1,4 @@
-fetch("products.json")
+fetch("http://Docker-env.eba-qame2mxj.us-east-1.elasticbeanstalk.com/products")
     .then(response => response.json())
     .then(products => {
         const list = document.getElementById("product-list");
