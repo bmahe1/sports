@@ -1,5 +1,5 @@
 // ============================================
-// CONFIGURATION - BACKEND URL
+// CONFIGURATION
 // ============================================
 const BACKEND_URL = "http://sports-backend-env-1.eba-kwmiynem.us-east-1.elasticbeanstalk.com";
 const API_URL = `${BACKEND_URL}/api/products`;
@@ -10,91 +10,68 @@ const API_URL = `${BACKEND_URL}/api/products`;
 let allProducts = [];
 
 // ============================================
-// LOAD AND DISPLAY PRODUCTS
+// LOAD PRODUCTS
 // ============================================
 async function loadProducts() {
     try {
         const response = await fetch(API_URL);
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         allProducts = await response.json();
-        console.log("Loaded products:", allProducts);
         displayProducts(allProducts);
     } catch (err) {
-        console.error("Failed to load products", err);
         document.getElementById("product-list").innerHTML = `
-            <div style="text-align: center; padding: 40px; color: #d32f2f;">
-                <h3>⚠️ Unable to Load Products</h3>
-                <p>Error: ${err.message}</p>
-                <button onclick="loadProducts()" 
-                        style="padding: 10px 20px; background: #008cff; 
-                               color: white; border: none; border-radius: 5px;">
-                    Retry
-                </button>
-            </div>
+            <h3 style="color:red;text-align:center;">Failed to load products</h3>
         `;
+        console.error(err);
     }
 }
 
 // ============================================
-// DISPLAY ALL PRODUCTS (MAIN PAGE)
+// DISPLAY PRODUCTS
 // ============================================
 function displayProducts(products) {
     const list = document.getElementById("product-list");
-    
-    list.innerHTML = products.map(product => `
-        <div class='card' onclick="showProductDetails(${product.id})" 
-             style="cursor: pointer;">
-            <img src="${product.image}" alt="${product.name}" 
-                 onerror="this.src='https://via.placeholder.com/300x200?text=Sports+Gear'"/>
-            <h3>${product.name}</h3>
-            <p class="price">$${product.price}</p>
+    list.innerHTML = products.map(p => `
+        <div class="card" onclick="showProductDetails(${p.id})">
+            <img src="${p.image}" alt="${p.name}">
+            <h3>${p.name}</h3>
+            <p class="price">$${p.price}</p>
             <p class="click-hint">Click for details →</p>
         </div>
     `).join("");
 }
 
 // ============================================
-// SHOW SINGLE PRODUCT DETAILS
+// PRODUCT DETAILS
 // ============================================
 function showProductDetails(productId) {
-    // Find the clicked product
-    const product = allProducts.find(p => p.id == productId);
-    
-    if (!product) {
-        alert("Product not found!");
-        return;
-    }
-    
-    const list = document.getElementById("product-list");
-    
-    // Create detailed view
-    list.innerHTML = `
+    const product = allProducts.find(p => p.id === productId);
+    if (!product) return alert("Product not found");
+
+    document.getElementById("product-list").innerHTML = `
         <div class="product-detail-container">
             <button class="back-button" onclick="displayProducts(allProducts)">
-                ← Back to All Products
+                ← Back
             </button>
-            
+
             <div class="product-detail-card">
                 <div class="product-image">
-                    <img src="${product.image}" alt="${product.name}" 
-                         onerror="this.src='https://via.placeholder.com/500x350?text=${encodeURIComponent(product.name)}'"/>
+                    <img src="${product.image}" alt="${product.name}">
                 </div>
-                
+
                 <div class="product-info">
                     <h1>${product.name}</h1>
                     <p class="product-price">$${product.price}</p>
-                    
+
                     <div class="product-description">
-                        <h3>Product Details:</h3>
                         <ul>
-                            <li><strong>Product ID:</strong> ${product.id}</li>
-                            <li><strong>Category:</strong> ${getProductCategory(product.name)}</li>
-                            <li><strong>Material:</strong> Premium Sports Grade</li>
-                            <li><strong>Warranty:</strong> 1 Year Manufacturer</li>
+                            <li><strong>ID:</strong> ${product.id}</li>
+                            <li><strong>Category:</strong> ${getCategory(product.name)}</li>
+                            <li><strong>Material:</strong> Sports Grade</li>
+                            <li><strong>Warranty:</strong> 1 Year</li>
                         </ul>
                     </div>
-                    
+
                     <div class="action-buttons">
                         <button class="add-to-cart-btn" onclick="addToCart(${product.id})">
                             🛒 Add to Cart
@@ -110,35 +87,31 @@ function showProductDetails(productId) {
 }
 
 // ============================================
-// HELPER FUNCTIONS
+// HELPERS
 // ============================================
-function getProductCategory(productName) {
-    if (productName.includes("Football")) return "Team Sports";
-    if (productName.includes("Cricket")) return "Bat Sports";
-    if (productName.includes("Tennis")) return "Racket Sports";
+function getCategory(name) {
+    if (name.includes("Football")) return "Team Sports";
+    if (name.includes("Cricket")) return "Bat Sports";
+    if (name.includes("Tennis")) return "Racket Sports";
     return "Sports Equipment";
 }
 
-function addToCart(productId) {
-    const product = allProducts.find(p => p.id == productId);
-    alert(`✅ "${product.name}" has been added to your cart!\nPrice: $${product.price}`);
-    // In real app: Update cart state, localStorage, etc.
+function addToCart(id) {
+    const p = allProducts.find(p => p.id === id);
+    alert(`Added ${p.name} ($${p.price})`);
 }
 
-function buyNow(productId) {
-    const product = allProducts.find(p => p.id == productId);
-    alert(`🚀 Purchasing: "${product.name}"\nTotal: $${product.price}\nRedirecting to checkout...`);
-    // In real app: Redirect to checkout page
+function buyNow(id) {
+    const p = allProducts.find(p => p.id === id);
+    alert(`Buying ${p.name} ($${p.price})`);
 }
 
 // ============================================
-// INITIALIZE APP
+// INIT
 // ============================================
 document.addEventListener("DOMContentLoaded", loadProducts);
 
-// Make functions available globally (for onclick events)
 window.showProductDetails = showProductDetails;
 window.displayProducts = displayProducts;
 window.addToCart = addToCart;
 window.buyNow = buyNow;
-window.loadProducts = loadProducts;
