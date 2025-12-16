@@ -4,7 +4,7 @@
 
 // 1. YOUR ELASTIC BEANSTALK BACKEND URL
 // Get this from: Elastic Beanstalk Console → Your Environment → Domain
-const BACKEND_URL = "http://sports-env-env.eba-e54e7b2p.us-east-1.elasticbeanstalk.com";
+const BACKEND_URL = "http://sports-backend-env-1.eba-kwmiynem.us-east-1.elasticbeanstalk.com";
 // Example: http://sports-env-env.eba-e54e7b2p.us-east-1.elasticbeanstalk.com
 
 // 2. API ENDPOINT
