@@ -1,4 +1,4 @@
-const BACKEND_URL = "http://sports-backend-env-1.eba-kwmiynem.us-east-1.elasticbeanstalk.com";
+const BACKEND_URL = "http://app-1-env.eba-4na5mm5w.us-east-1.elasticbeanstalk.com/";
 const API_URL = `${BACKEND_URL}/api/products`;
 
 async function loadProducts() {
