@@ -18,6 +18,7 @@ async function loadProducts() {
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         
         allProducts = await response.json();
+        console.log("Loaded products:", allProducts);
         displayProducts(allProducts);
     } catch (err) {
         console.error("Failed to load products", err);
@@ -25,78 +26,119 @@ async function loadProducts() {
             <div style="text-align: center; padding: 40px; color: #d32f2f;">
                 <h3>⚠️ Unable to Load Products</h3>
                 <p>Error: ${err.message}</p>
-                <button onclick="loadProducts()">Retry</button>
+                <button onclick="loadProducts()" 
+                        style="padding: 10px 20px; background: #008cff; 
+                               color: white; border: none; border-radius: 5px;">
+                    Retry
+                </button>
             </div>
         `;
     }
 }
 
+// ============================================
+// DISPLAY ALL PRODUCTS (MAIN PAGE)
+// ============================================
 function displayProducts(products) {
     const list = document.getElementById("product-list");
     
     list.innerHTML = products.map(product => `
         <div class='card' onclick="showProductDetails(${product.id})" 
-             style="cursor: pointer; transition: transform 0.2s;"
-             onmouseover="this.style.transform='scale(1.02)'"
-             onmouseout="this.style.transform='scale(1)'">
-            <img src="${product.image}" alt="${product.name}" />
+             style="cursor: pointer;">
+            <img src="${product.image}" alt="${product.name}" 
+                 onerror="this.src='https://via.placeholder.com/300x200?text=Sports+Gear'"/>
             <h3>${product.name}</h3>
-            <p>Price: $${product.price}</p>
-            <p><small>Click for details →</small></p>
+            <p class="price">$${product.price}</p>
+            <p class="click-hint">Click for details →</p>
         </div>
     `).join("");
 }
 
 // ============================================
-// SHOW PRODUCT DETAILS
+// SHOW SINGLE PRODUCT DETAILS
 // ============================================
 function showProductDetails(productId) {
-    const product = allProducts.find(p => p.id === productId);
-    if (!product) return;
+    // Find the clicked product
+    const product = allProducts.find(p => p.id == productId);
+    
+    if (!product) {
+        alert("Product not found!");
+        return;
+    }
     
     const list = document.getElementById("product-list");
     
+    // Create detailed view
     list.innerHTML = `
-        <div style="max-width: 600px; margin: 0 auto;">
-            <button onclick="displayProducts(allProducts)" 
-                    style="margin-bottom: 20px; padding: 10px 20px; 
-                           background: #008cff; color: white; 
-                           border: none; border-radius: 5px; cursor: pointer;">
-                ← Back to Products
+        <div class="product-detail-container">
+            <button class="back-button" onclick="displayProducts(allProducts)">
+                ← Back to All Products
             </button>
             
-            <div class='card' style="text-align: center;">
-                <img src="${product.image}" alt="${product.name}" 
-                     style="max-height: 400px; object-fit: contain;" />
-                <h2>${product.name}</h2>
-                <p style="font-size: 1.5em; color: #2ecc71; font-weight: bold;">
-                    Price: $${product.price}
-                </p>
-                <p><strong>Product ID:</strong> ${product.id}</p>
-                <p>Premium quality sports equipment for professional use.</p>
+            <div class="product-detail-card">
+                <div class="product-image">
+                    <img src="${product.image}" alt="${product.name}" 
+                         onerror="this.src='https://via.placeholder.com/500x350?text=${encodeURIComponent(product.name)}'"/>
+                </div>
                 
-                <button onclick="addToCart(${product.id})" 
-                        style="margin-top: 20px; padding: 15px 30px; 
-                               background: #2ecc71; color: white; 
-                               border: none; border-radius: 8px; 
-                               font-size: 1.1em; cursor: pointer;">
-                    Add to Cart
-                </button>
+                <div class="product-info">
+                    <h1>${product.name}</h1>
+                    <p class="product-price">$${product.price}</p>
+                    
+                    <div class="product-description">
+                        <h3>Product Details:</h3>
+                        <ul>
+                            <li><strong>Product ID:</strong> ${product.id}</li>
+                            <li><strong>Category:</strong> ${getProductCategory(product.name)}</li>
+                            <li><strong>Material:</strong> Premium Sports Grade</li>
+                            <li><strong>Warranty:</strong> 1 Year Manufacturer</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="add-to-cart-btn" onclick="addToCart(${product.id})">
+                            🛒 Add to Cart
+                        </button>
+                        <button class="buy-now-btn" onclick="buyNow(${product.id})">
+                            ⚡ Buy Now
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     `;
 }
 
 // ============================================
-// ADD TO CART FUNCTION
+// HELPER FUNCTIONS
 // ============================================
+function getProductCategory(productName) {
+    if (productName.includes("Football")) return "Team Sports";
+    if (productName.includes("Cricket")) return "Bat Sports";
+    if (productName.includes("Tennis")) return "Racket Sports";
+    return "Sports Equipment";
+}
+
 function addToCart(productId) {
-    const product = allProducts.find(p => p.id === productId);
-    alert(`✅ ${product.name} added to cart! Price: $${product.price}`);
-    // In a real app, you would update cart state here
+    const product = allProducts.find(p => p.id == productId);
+    alert(`✅ "${product.name}" has been added to your cart!\nPrice: $${product.price}`);
+    // In real app: Update cart state, localStorage, etc.
+}
+
+function buyNow(productId) {
+    const product = allProducts.find(p => p.id == productId);
+    alert(`🚀 Purchasing: "${product.name}"\nTotal: $${product.price}\nRedirecting to checkout...`);
+    // In real app: Redirect to checkout page
 }
 
 // ============================================
 // INITIALIZE APP
 // ============================================
 document.addEventListener("DOMContentLoaded", loadProducts);
+
+// Make functions available globally (for onclick events)
+window.showProductDetails = showProductDetails;
+window.displayProducts = displayProducts;
+window.addToCart = addToCart;
+window.buyNow = buyNow;
+window.loadProducts = loadProducts;
