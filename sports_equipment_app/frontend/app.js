@@ -1,4 +1,4 @@
-fetch("http://54.152.33.30:8080/products") // or EB environment URL
+fetch("products.json")
     .then(response => response.json())
     .then(products => {
         const list = document.getElementById("product-list");
